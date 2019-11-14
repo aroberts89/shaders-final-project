@@ -1,0 +1,61 @@
+#version 330 
+#extension GL_ARB_explicit_attrib_location : require 
+#extension GL_ARB_explicit_uniform_location : require 
+
+/* Strict Binding for Cross-hardware Compatability */
+layout(location = 0) in vec3 position;
+layout(location = 1) in vec3 normal;
+layout(location = 2) in vec4 tangent;
+layout(location = 3) in vec3 textureCoordinate;
+layout(location = 4) in vec3 color;
+
+uniform float time;
+
+/* Uniform variables for Camera and Light Direction */ 
+uniform mat4 modelViewMatrix;
+uniform mat4 projectionMatrix;
+uniform mat3 normalMatrix;
+uniform vec3 lightPosition;
+
+/* 
+ * Light model information interpolated between each vertex. This information is 
+ * used to compute the light model within the fragment shader based on the 
+ * interpolated vector values. 
+ */ 
+out vec3 interpSurfaceNormal;
+out vec3 interpVertexPosition;
+out vec3 interpLightPosition;
+out vec2 interpTextureCoord;
+
+/* Displacement Mapping */
+void main(void) {
+	vec4 vPosition = vec4(position, 1.0f);
+	vec4 lPosition = vec4(lightPosition, 1.0f);
+	
+	//---------------------------------------------------------------------------- 
+	// ADS Interpolated Light Model Vectors 
+	//---------------------------------------------------------------------------- 
+	interpLightPosition = vec3(modelViewMatrix * lPosition);
+    interpVertexPosition = vec3(modelViewMatrix * vPosition);       
+    interpSurfaceNormal = normalize(normalMatrix * normal);
+	interpTextureCoord = vec2(textureCoordinate);
+	
+	//---------------------------------------------------------------------------- 
+	// Use the height map to displace each vertex according to the direction of
+	// its associated normal. The constants are to convert the rgb image into
+	// a gray value.
+	//---------------------------------------------------------------------------- 
+	// Translate the y coordinate
+	float Velocity = 0.05f;
+	float K = 0.5f;
+	float Amp = 0.7f;
+	float u = K * (position.x - Velocity * time);
+	float yDisp = Amp * sin( u );
+	vec4 dispVector = vec4(normal * yDisp, 0.0f);
+	vec4 dispPosition = vec4(position, 1.0f) + dispVector;
+	
+	//-------------------------------------------------------------------------- 
+	// Transform the vertex for the fragment shader. 
+	//-------------------------------------------------------------------------- 
+    gl_Position = projectionMatrix * modelViewMatrix * dispPosition;
+}
