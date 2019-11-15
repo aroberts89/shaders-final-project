@@ -32,7 +32,6 @@ void g_init() {
     mesh = std::make_shared<Mesh>();
     mesh->load("models/tessellated_plane.obj");
     mesh->loadShader("shaders/DisplacementMapping.vert", "shaders/DisplacementMapping.frag");
-    mesh->setHeightmapTexture("textures/displacementmap.png");
 }
 
 void g_glutReshapeFunc(int width, int height) {

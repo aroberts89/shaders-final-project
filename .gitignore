@@ -28,6 +28,8 @@ x86/
 bld/
 [Bb]in/
 [Oo]bj/
+objs/
+lib/
 [Ll]og/
 
 # Visual Studio 2015/2017 cache/options directory

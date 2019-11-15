@@ -12,7 +12,11 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\DisplacementMapping.frag" />
-    <None Include="shaders\DisplacementMapping.vert" />
+    <None Include="shaders\DisplacementMapping.frag">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="shaders\DisplacementMapping.vert">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
