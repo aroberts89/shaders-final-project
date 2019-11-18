@@ -12,8 +12,8 @@
 #include <chrono>
 
 const char* WINDOW_TITLE = "[CSCI-4800/5800] Shader and GPU Programming";
-const int WINDOW_WIDTH = 600;
-const int WINDOW_HEIGHT = 400;
+const int WINDOW_WIDTH = 800;
+const int WINDOW_HEIGHT = 600;
 GLint g_glutWindowIdentifier;
 
 const static unsigned int TIMERMSECS = 33;
@@ -40,6 +40,8 @@ void g_glutReshapeFunc(int width, int height) {
 	glutPostRedisplay();
 }
 
+float velocity = 0.05f;
+float amplitude = 0.7f;
 void g_glutDisplayFunc() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
@@ -58,6 +60,8 @@ void g_glutDisplayFunc() {
 	long time = std::chrono::duration_cast<std::chrono::milliseconds>(now).count();
 	time = (float)(time / 16.67); // This gives us a number that updates 60 times per second
 	mesh->getShader()->uniform1f("time", time);
+	mesh->getShader()->uniform1f("amplitude", amplitude);
+	mesh->getShader()->uniform1f("velocity", velocity);
     mesh->endRender();
 
     glFlush();
@@ -73,6 +77,15 @@ void g_glutMouseFunc(int button, int state, int x, int y) {
     if ( button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN ) camera->onMouseButton(RB_DOWN, x, y);
     if ( button == GLUT_LEFT_BUTTON && state == GLUT_UP ) camera->onMouseButton(LB_UP, x, y);
     if ( button == GLUT_RIGHT_BUTTON && state == GLUT_UP ) camera->onMouseButton(RB_UP, x, y);
+}
+
+void g_glutKeyboardFunc(unsigned char key, int x, int y) {
+	switch (key) {
+	case 'w': amplitude += 0.1f; break;
+	case 's': amplitude -= 0.1f; break;
+	case 'd': velocity += 0.05f; break;
+	case 'a': velocity -= 0.05f; break;
+	}
 }
 
 void update(int value) {
@@ -91,6 +104,7 @@ int main(int argc, char* argv[]) {
 	glutReshapeFunc(g_glutReshapeFunc);
     glutMotionFunc(g_glutMotionFunc);
     glutMouseFunc(g_glutMouseFunc);
+	glutKeyboardFunc(g_glutKeyboardFunc);
 
     glutTimerFunc(TIMERMSECS, update, 0);
 

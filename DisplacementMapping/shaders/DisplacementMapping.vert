@@ -10,6 +10,8 @@ layout(location = 3) in vec3 textureCoordinate;
 layout(location = 4) in vec3 color;
 
 uniform float time;
+uniform float amplitude;
+uniform float velocity;
 
 /* Uniform variables for Camera and Light Direction */ 
 uniform mat4 modelViewMatrix;
@@ -40,17 +42,10 @@ void main(void) {
     interpSurfaceNormal = normalize(normalMatrix * normal);
 	interpTextureCoord = vec2(textureCoordinate);
 	
-	//---------------------------------------------------------------------------- 
-	// Use the height map to displace each vertex according to the direction of
-	// its associated normal. The constants are to convert the rgb image into
-	// a gray value.
-	//---------------------------------------------------------------------------- 
 	// Translate the y coordinate
-	float Velocity = 0.05f;
 	float K = 0.5f;
-	float Amp = 0.7f;
-	float u = K * (position.x - Velocity * time);
-	float yDisp = Amp * sin( u );
+	float u = K * (position.x - velocity * time);
+	float yDisp = amplitude * sin( u );
 	vec4 dispVector = vec4(normal * yDisp, 0.0f);
 	vec4 dispPosition = vec4(position, 1.0f) + dispVector;
 	
