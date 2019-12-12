@@ -12,10 +12,13 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\DisplacementMapping.frag">
+    <None Include="shaders\Wave.vert">
       <Filter>Source Files</Filter>
     </None>
-    <None Include="shaders\DisplacementMapping.vert">
+    <None Include="shaders\Ripple.vert">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="shaders\ProceduralGeometry.frag">
       <Filter>Source Files</Filter>
     </None>
   </ItemGroup>

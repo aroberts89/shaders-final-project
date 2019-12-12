@@ -31,7 +31,7 @@ void g_init() {
 
     mesh = std::make_shared<Mesh>();
     mesh->load("models/tessellated_plane.obj");
-    mesh->loadShader("shaders/DisplacementMapping.vert", "shaders/DisplacementMapping.frag");
+    mesh->loadShader("shaders/Ripple.vert", "shaders/ProceduralGeometry.frag");
 }
 
 void g_glutReshapeFunc(int width, int height) {

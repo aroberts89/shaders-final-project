@@ -146,8 +146,9 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\DisplacementMapping.frag" />
-    <None Include="shaders\DisplacementMapping.vert" />
+    <None Include="shaders\ProceduralGeometry.frag" />
+    <None Include="shaders\Ripple.vert" />
+    <None Include="shaders\Wave.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
