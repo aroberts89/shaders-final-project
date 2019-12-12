@@ -30,6 +30,8 @@ float amplitude = 0.7f;
 void g_init() {
 	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
     glEnable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     glewInit();
 
     camera = std::make_shared<MouseCameraf>(3.0f);
@@ -62,12 +64,23 @@ void g_glutDisplayFunc() {
 
     Matrix4f view = camera->getViewMatrix();
     Matrix4f projectionMatrix = camera->getProjectionMatrix();
+	Vector3f lightPosition = Vector3f(0.0f, 12.0f, 0.0f);
+
+    Matrix4f groundTransform = ground->getTransform().toMatrix();
+    Matrix4f groundModelViewMatrix = groundTransform * camera->getViewMatrix();
+    Matrix3f groundNormalMatrix = Matrix4f::NormalMatrix(groundModelViewMatrix);
+
+	ground->beginRender();
+    ground->getShader()->uniformMatrix("projectionMatrix", projectionMatrix);
+    ground->getShader()->uniformMatrix("modelViewMatrix", groundModelViewMatrix);
+    ground->getShader()->uniformMatrix("normalMatrix", groundNormalMatrix);
+    ground->getShader()->uniformVector("lightPosition", lightPosition);
+    ground->endRender();
     
     Matrix4f surfaceTransform = surface->getTransform().toMatrix();
     Matrix4f surfaceModelViewMatrix = surfaceTransform * camera->getViewMatrix();
     Matrix3f surfaceNormalMatrix = Matrix4f::NormalMatrix(surfaceModelViewMatrix);
 
-	Vector3f lightPosition = Vector3f(0.0f, 12.0f, 0.0f);
 
     surface->beginRender();
     surface->getShader()->uniformMatrix("projectionMatrix", projectionMatrix);
@@ -83,16 +96,6 @@ void g_glutDisplayFunc() {
 	surface->getShader()->uniform1f("velocity", velocity);
     surface->endRender();
 
-    Matrix4f groundTransform = ground->getTransform().toMatrix();
-    Matrix4f groundModelViewMatrix = groundTransform * camera->getViewMatrix();
-    Matrix3f groundNormalMatrix = Matrix4f::NormalMatrix(groundModelViewMatrix);
-
-	ground->beginRender();
-    ground->getShader()->uniformMatrix("projectionMatrix", projectionMatrix);
-    ground->getShader()->uniformMatrix("modelViewMatrix", groundModelViewMatrix);
-    ground->getShader()->uniformMatrix("normalMatrix", groundNormalMatrix);
-    ground->getShader()->uniformVector("lightPosition", lightPosition);
-    ground->endRender();
 
     glFlush();
 }

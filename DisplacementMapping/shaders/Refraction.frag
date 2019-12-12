@@ -15,10 +15,9 @@ uniform samplerCube cubeMap;
 in vec3 interpReflectDir;
 in vec3 interpRefractDir;
 
-out vec4 fragColor;
-
 /* Refraction Shader */
 void main(void) {
+
 	//--------------------------------------------------------------------------
 	// Look up both the reflection and refraction color values based on the 
 	// same cubemap. The resulting fragment color will be a combination of these
@@ -37,5 +36,6 @@ void main(void) {
 	c += reflectFrac * refractColor;
 	c += (1.0f - reflectFrac) * reflectColor;
 	
-	fragColor = c;
+	c.a = 0.8f;
+	gl_FragColor = c;
 }
