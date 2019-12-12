@@ -85,6 +85,8 @@ void g_glutKeyboardFunc(unsigned char key, int x, int y) {
 	case 's': amplitude -= 0.1f; break;
 	case 'd': velocity += 0.02f; break;
 	case 'a': velocity -= 0.02f; break;
+	case '1': mesh->loadShader("shaders/Wave.vert", "shaders/ProceduralGeometry.frag"); break;
+	case '2': mesh->loadShader("shaders/Ripple.vert", "shaders/ProceduralGeometry.frag"); break;
 	}
 }
 
