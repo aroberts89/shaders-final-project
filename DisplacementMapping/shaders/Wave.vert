@@ -18,6 +18,7 @@ uniform mat4 modelViewMatrix;
 uniform mat4 projectionMatrix;
 uniform mat3 normalMatrix;
 uniform vec3 lightPosition;
+uniform vec3 cameraPosition;
 
 /* 
  * Light model information interpolated between each vertex. This information is 
@@ -31,10 +32,16 @@ out vec2 interpTextureCoord;
 
 out float heightRatio;
 
+/* Reflection and refraction directions to be interpolated across the surface. */
+out vec3 interpReflectDir;
+out vec3 interpRefractDir;
+
 /* Displacement Mapping */
 void main(void) {
 	vec4 vPosition = vec4(position, 1.0f);
 	vec4 lPosition = vec4(lightPosition, 1.0f);
+
+	vec3 cameraPosition = vec3(modelViewMatrix * vec4(cameraPosition, 1.0f));
 
 	//---------------------------------------------------------------------------- 
 	// ADS Interpolated Light Model Vectors 
@@ -43,6 +50,22 @@ void main(void) {
     interpVertexPosition = vec3(modelViewMatrix * vPosition);       
     interpSurfaceNormal = normalize(normalMatrix * normal);
 	interpTextureCoord = vec2(textureCoordinate);
+
+	//-------------------------------------------------------------------------- 
+	// The reflection and refraction directions are view dependent.
+	//-------------------------------------------------------------------------- 
+	vec3 view = normalize(cameraPosition - interpVertexPosition);
+	
+	//-------------------------------------------------------------------------- 
+	// Calculate the reflection and refraction directions to be usedas
+	// cubemap texture coordinates. The constant 'eta' values is based on the 
+	// index of refraction for a particular material (these values can be 
+	// looked up using any physics textbook or on the internet).
+	//-------------------------------------------------------------------------- 
+	interpReflectDir = reflect(-view, interpSurfaceNormal);
+	float eta = 1.0 / 1.5f;
+	interpRefractDir = refract(-view, interpSurfaceNormal, eta);
+	
 	
 	// Translate the y coordinate
 	float K = 0.5f;

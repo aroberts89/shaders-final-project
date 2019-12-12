@@ -18,7 +18,16 @@
     <None Include="shaders\Ripple.vert">
       <Filter>Source Files</Filter>
     </None>
-    <None Include="shaders\ProceduralGeometry.frag">
+    <None Include="shaders\Refraction.frag">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="shaders\Wireframe.frag">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="shaders\SpecularMapping.frag">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="shaders\SpecularMapping.vert">
       <Filter>Source Files</Filter>
     </None>
   </ItemGroup>

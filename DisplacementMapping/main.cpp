@@ -7,6 +7,7 @@
 #include <Mesh.h>
 #include <Shader.h>
 #include <Texture.h>
+#include <EnvironmentMap.h>
 
 #include <stdlib.h>
 #include <chrono>
@@ -19,7 +20,12 @@ GLint g_glutWindowIdentifier;
 const static unsigned int TIMERMSECS = 33;
 
 std::shared_ptr<MouseCameraf> camera = nullptr;
-std::shared_ptr<Mesh> mesh = nullptr;
+std::shared_ptr<Mesh> surface = nullptr;
+std::shared_ptr<Mesh> ground = nullptr;
+std::shared_ptr<EnvironmentMap> map = nullptr;
+
+float velocity = 0.05f;
+float amplitude = 0.7f;
 
 void g_init() {
 	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
@@ -29,9 +35,20 @@ void g_init() {
     camera = std::make_shared<MouseCameraf>(3.0f);
     camera->setPosition(18.0f, 1.5707f, 1.570f * 0.7f);
 
-    mesh = std::make_shared<Mesh>();
-    mesh->load("models/tessellated_plane.obj");
-    mesh->loadShader("shaders/Ripple.vert", "shaders/ProceduralGeometry.frag");
+    surface = std::make_shared<Mesh>();
+    surface->load("models/tessellated_plane.obj");
+    surface->loadShader("shaders/Ripple.vert", "shaders/Refraction.frag");
+
+    ground = std::make_shared<Mesh>();
+    ground->load("models/tessellated_plane.obj");
+    ground->loadShader("shaders/SpecularMapping.vert", "shaders/SpecularMapping.frag");
+    ground->setDiffuseTexture("textures/marble_diffuse.png");
+    ground->setNormalTexture("textures/marble_normal.png");
+    ground->setSpecularTexture("textures/marble_specular.png");
+	ground->setPosition(0.0f, -amplitude - 1.0f, 0.0f);
+
+	map = std::make_shared<EnvironmentMap>();
+    map->load("images/clouds");
 }
 
 void g_glutReshapeFunc(int width, int height) {
@@ -40,29 +57,42 @@ void g_glutReshapeFunc(int width, int height) {
 	glutPostRedisplay();
 }
 
-float velocity = 0.05f;
-float amplitude = 0.7f;
 void g_glutDisplayFunc() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    
-    Matrix4f transform = mesh->getTransform().toMatrix();
-    Matrix4f view = camera->getViewMatrix();
-    Matrix4f modelViewMatrix = transform * camera->getViewMatrix();
-    Matrix3f normalMatrix = Matrix4f::NormalMatrix(modelViewMatrix);
-    Matrix4f projectionMatrix = camera->getProjectionMatrix();
 
-    mesh->beginRender();
-    mesh->getShader()->uniformMatrix("projectionMatrix", projectionMatrix);
-    mesh->getShader()->uniformMatrix("modelViewMatrix", modelViewMatrix);
-    mesh->getShader()->uniformMatrix("normalMatrix", normalMatrix);
-    mesh->getShader()->uniformVector("lightPosition", Vector3f(0.0f, 12.0f, 0.0f));
+    Matrix4f view = camera->getViewMatrix();
+    Matrix4f projectionMatrix = camera->getProjectionMatrix();
+    
+    Matrix4f surfaceTransform = surface->getTransform().toMatrix();
+    Matrix4f surfaceModelViewMatrix = surfaceTransform * camera->getViewMatrix();
+    Matrix3f surfaceNormalMatrix = Matrix4f::NormalMatrix(surfaceModelViewMatrix);
+
+	Vector3f lightPosition = Vector3f(0.0f, 12.0f, 0.0f);
+
+    surface->beginRender();
+    surface->getShader()->uniformMatrix("projectionMatrix", projectionMatrix);
+    surface->getShader()->uniformMatrix("modelViewMatrix", surfaceModelViewMatrix);
+    surface->getShader()->uniformMatrix("normalMatrix", surfaceNormalMatrix);
+    surface->getShader()->uniformVector("lightPosition", lightPosition);
+	surface->getShader()->uniformVector("cameraPosition", camera->getEye());
 	auto now = std::chrono::steady_clock::now().time_since_epoch();
 	long time = std::chrono::duration_cast<std::chrono::milliseconds>(now).count();
 	time = (float)(time / 16.67); // This gives us a number that updates 60 times per second
-	mesh->getShader()->uniform1f("time", time);
-	mesh->getShader()->uniform1f("amplitude", amplitude);
-	mesh->getShader()->uniform1f("velocity", velocity);
-    mesh->endRender();
+	surface->getShader()->uniform1f("time", time);
+	surface->getShader()->uniform1f("amplitude", amplitude);
+	surface->getShader()->uniform1f("velocity", velocity);
+    surface->endRender();
+
+    Matrix4f groundTransform = ground->getTransform().toMatrix();
+    Matrix4f groundModelViewMatrix = groundTransform * camera->getViewMatrix();
+    Matrix3f groundNormalMatrix = Matrix4f::NormalMatrix(groundModelViewMatrix);
+
+	ground->beginRender();
+    ground->getShader()->uniformMatrix("projectionMatrix", projectionMatrix);
+    ground->getShader()->uniformMatrix("modelViewMatrix", groundModelViewMatrix);
+    ground->getShader()->uniformMatrix("normalMatrix", groundNormalMatrix);
+    ground->getShader()->uniformVector("lightPosition", lightPosition);
+    ground->endRender();
 
     glFlush();
 }
@@ -81,12 +111,20 @@ void g_glutMouseFunc(int button, int state, int x, int y) {
 
 void g_glutKeyboardFunc(unsigned char key, int x, int y) {
 	switch (key) {
-	case 'w': amplitude += 0.1f; break;
-	case 's': amplitude -= 0.1f; break;
+	case 'w': 
+		amplitude += 0.1f; 
+		ground->setPosition(0.0f, -amplitude - 1.0f, 0.0f);
+		break;
+	case 's': 
+		amplitude -= 0.1f;
+		ground->setPosition(0.0f, -amplitude - 1.0f, 0.0f);
+		break;
 	case 'd': velocity += 0.02f; break;
 	case 'a': velocity -= 0.02f; break;
-	case '1': mesh->loadShader("shaders/Wave.vert", "shaders/ProceduralGeometry.frag"); break;
-	case '2': mesh->loadShader("shaders/Ripple.vert", "shaders/ProceduralGeometry.frag"); break;
+	case '1': surface->loadShader("shaders/Wave.vert", "shaders/Wireframe.frag"); break;
+	case '2': surface->loadShader("shaders/Wave.vert", "shaders/Refraction.frag"); break;
+	case '3': surface->loadShader("shaders/Ripple.vert", "shaders/Wireframe.frag"); break;
+	case '4': surface->loadShader("shaders/Ripple.vert", "shaders/Refraction.frag"); break;
 	}
 }
 

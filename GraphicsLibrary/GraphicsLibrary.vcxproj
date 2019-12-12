@@ -137,6 +137,7 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Color3.h" />
     <ClInclude Include="Color4.h" />
+    <ClInclude Include="EnvironmentMap.h" />
     <ClInclude Include="Face.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="Mesh.h" />
@@ -148,6 +149,7 @@
     <ClInclude Include="Vertex.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="EnvironmentMap.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="ObjMesh.cpp" />
     <ClCompile Include="PNG.cpp" />
