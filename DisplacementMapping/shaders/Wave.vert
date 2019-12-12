@@ -29,11 +29,13 @@ out vec3 interpVertexPosition;
 out vec3 interpLightPosition;
 out vec2 interpTextureCoord;
 
+out float heightRatio;
+
 /* Displacement Mapping */
 void main(void) {
 	vec4 vPosition = vec4(position, 1.0f);
 	vec4 lPosition = vec4(lightPosition, 1.0f);
-	
+
 	//---------------------------------------------------------------------------- 
 	// ADS Interpolated Light Model Vectors 
 	//---------------------------------------------------------------------------- 
@@ -45,9 +47,11 @@ void main(void) {
 	// Translate the y coordinate
 	float K = 0.5f;
 	float u = K * (position.x - velocity * time);
-	float yDisp = amplitude * sin( u );
-	vec4 dispVector = vec4(normal * yDisp, 0.0f);
+	float disp = amplitude * sin( u );
+	vec4 dispVector = vec4(normal * disp, 0.0f);
 	vec4 dispPosition = vec4(position, 1.0f) + dispVector;
+
+	heightRatio = (disp + amplitude) / (2 * amplitude);
 	
 	//-------------------------------------------------------------------------- 
 	// Transform the vertex for the fragment shader. 

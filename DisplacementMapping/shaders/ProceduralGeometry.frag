@@ -8,6 +8,8 @@ in vec3 interpVertexPosition;
 in vec3 interpLightPosition;
 in vec2 interpTextureCoord;
 
+in float heightRatio;
+
 /* Displacement Mapping */
 void main(void) {
 	//-------------------------------------------------------------------------- 
@@ -36,6 +38,9 @@ void main(void) {
 	//--------------------------------------------------------------------------
 	vec4 Ka = vec4(0.1f, 0.1f, 0.1f, 1.0f);
 	vec4 Kd = vec4(0.2f, 0.6f, 0.8f, 1.0f);
+	Kd.x = heightRatio;
+	Kd.z = 1 - heightRatio;
+	Kd.y = 2 * (0.5f - abs(heightRatio - 0.5f));
 	vec4 Ks = vec4(0.6f, 0.7f, 1.0f, 1.0f);
 	float shininess = 16.0f;
 	
