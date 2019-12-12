@@ -83,8 +83,8 @@ void g_glutKeyboardFunc(unsigned char key, int x, int y) {
 	switch (key) {
 	case 'w': amplitude += 0.1f; break;
 	case 's': amplitude -= 0.1f; break;
-	case 'd': velocity += 0.05f; break;
-	case 'a': velocity -= 0.05f; break;
+	case 'd': velocity += 0.02f; break;
+	case 'a': velocity -= 0.02f; break;
 	}
 }
 
