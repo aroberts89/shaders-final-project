@@ -35,6 +35,10 @@ void main(void) {
 	vec4 c = vec4(0.0f);
 	c += reflectFrac * refractColor;
 	c += (1.0f - reflectFrac) * reflectColor;
+
+	vec4 Kd = vec4(0.2f, 0.5f, 0.8f, 1.0f);
+
+	c = mix(c, Kd, 0.5f);
 	
 	c.a = 0.8f;
 	gl_FragColor = c;
