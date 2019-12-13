@@ -26,6 +26,7 @@ std::shared_ptr<EnvironmentMap> map = nullptr;
 
 float velocity = 0.05f;
 float amplitude = 0.7f;
+float noise = 0.1f;
 
 void g_init() {
 	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
@@ -39,7 +40,7 @@ void g_init() {
 
     surface = std::make_shared<Mesh>();
     surface->load("models/tessellated_plane.obj");
-    surface->loadShader("shaders/Ripple.vert", "shaders/Refraction.frag");
+    surface->loadShader("shaders/Wave.vert", "shaders/Refraction.frag");
 
     ground = std::make_shared<Mesh>();
     ground->load("models/tessellated_plane.obj");
@@ -94,6 +95,7 @@ void g_glutDisplayFunc() {
 	surface->getShader()->uniform1f("time", time);
 	surface->getShader()->uniform1f("amplitude", amplitude);
 	surface->getShader()->uniform1f("velocity", velocity);
+	surface->getShader()->uniform1f("noise", noise);
     surface->endRender();
 
 
@@ -124,6 +126,8 @@ void g_glutKeyboardFunc(unsigned char key, int x, int y) {
 		break;
 	case 'd': velocity += 0.02f; break;
 	case 'a': velocity -= 0.02f; break;
+	case 'n': noise += 0.1f; break;
+	case 'm': noise -= 0.1f; break;
 	case '1': surface->loadShader("shaders/Wave.vert", "shaders/Wireframe.frag"); break;
 	case '2': surface->loadShader("shaders/Wave.vert", "shaders/Refraction.frag"); break;
 	case '3': surface->loadShader("shaders/Ripple.vert", "shaders/Wireframe.frag"); break;

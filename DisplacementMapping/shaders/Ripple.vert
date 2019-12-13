@@ -12,6 +12,7 @@ layout(location = 4) in vec3 color;
 uniform float time;
 uniform float amplitude;
 uniform float velocity;
+uniform float noise;
 
 /* Uniform variables for Camera and Light Direction */ 
 uniform mat4 modelViewMatrix;
@@ -35,6 +36,10 @@ out float heightRatio;
 /* Reflection and refraction directions to be interpolated across the surface. */
 out vec3 interpReflectDir;
 out vec3 interpRefractDir;
+
+float rand(vec2 co){
+    return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
+}
 
 /* Displacement Mapping */
 void main(void) {
@@ -69,6 +74,7 @@ void main(void) {
 	// Translate the y coordinate
 	float r = -sqrt((position.x * position.x) + (position.z * position.z));
 	float disp = amplitude * sin(r + time * velocity) / r;
+	disp += noise * rand(vec2(position.x, position.z));
 	vec4 dispVector = vec4(normal * disp, 0.0f);
 	vec4 dispPosition = vec4(position, 1.0f) + dispVector;
 
