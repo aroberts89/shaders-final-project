@@ -28,6 +28,12 @@ float velocity = 0.05f;
 float amplitude = 0.7f;
 float noise = 0.1f;
 
+void setSurfaceTextures() {
+    surface->setDiffuseTexture("textures/water_diffuse.png");
+    surface->setNormalTexture("textures/water_normal.png");
+    surface->setSpecularTexture("textures/water_specular.png");
+}
+
 void g_init() {
 	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
     glEnable(GL_DEPTH_TEST);
@@ -41,6 +47,7 @@ void g_init() {
     surface = std::make_shared<Mesh>();
     surface->load("models/tessellated_plane.obj");
     surface->loadShader("shaders/Wave.vert", "shaders/Refraction.frag");
+	setSurfaceTextures();
 
     ground = std::make_shared<Mesh>();
     ground->load("models/tessellated_plane.obj");
@@ -128,10 +135,22 @@ void g_glutKeyboardFunc(unsigned char key, int x, int y) {
 	case 'a': velocity -= 0.02f; break;
 	case 'n': noise += 0.1f; break;
 	case 'm': noise -= 0.1f; break;
-	case '1': surface->loadShader("shaders/Wave.vert", "shaders/Wireframe.frag"); break;
-	case '2': surface->loadShader("shaders/Wave.vert", "shaders/Refraction.frag"); break;
-	case '3': surface->loadShader("shaders/Ripple.vert", "shaders/Wireframe.frag"); break;
-	case '4': surface->loadShader("shaders/Ripple.vert", "shaders/Refraction.frag"); break;
+	case '1': 
+		surface->loadShader("shaders/Wave.vert", "shaders/Wireframe.frag");
+		setSurfaceTextures();
+		break;
+	case '2': 
+		surface->loadShader("shaders/Wave.vert", "shaders/Refraction.frag");
+		setSurfaceTextures();
+		break;
+	case '3': 
+		surface->loadShader("shaders/Ripple.vert", "shaders/Wireframe.frag");
+		setSurfaceTextures();
+		break;
+	case '4': 
+		surface->loadShader("shaders/Ripple.vert", "shaders/Refraction.frag");
+		setSurfaceTextures();
+		break;
 	}
 }
 

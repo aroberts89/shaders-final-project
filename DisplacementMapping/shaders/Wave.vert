@@ -31,6 +31,9 @@ out vec3 interpVertexPosition;
 out vec3 interpLightPosition;
 out vec2 interpTextureCoord;
 
+/* Light direction in tangent space */
+out vec3 lightVector;
+
 out float heightRatio;
 
 /* Reflection and refraction directions to be interpolated across the surface. */
@@ -56,6 +59,28 @@ void main(void) {
     interpSurfaceNormal = normalize(normalMatrix * normal);
 	interpTextureCoord = vec2(textureCoordinate);
 
+	//---------------------------------------------------------------------------- 
+	// Determine the direction of the light from this vertex.
+	//---------------------------------------------------------------------------- 
+	vec3 lightDirection = vec3(interpLightPosition - interpVertexPosition);
+	
+	//---------------------------------------------------------------------------- 
+	// TBN Matrix. The matrix is left as a set of orthogonal vectors. The vector
+	// product with the matrix is the same as using three dot products.
+	//---------------------------------------------------------------------------- 
+	vec3 n = interpSurfaceNormal;
+	vec3 t = normalize(normalMatrix * vec3(tangent.xyz));
+	vec3 b = cross(n, t) * tangent.w;
+	
+	//---------------------------------------------------------------------------- 
+	// Determine the light direction in tangent space.
+	//---------------------------------------------------------------------------- 
+	vec3 v;
+	v.x = dot(lightDirection, t);
+	v.y = dot(lightDirection, b);
+	v.z = dot(lightDirection, n);
+	lightVector = normalize(v);
+
 	//-------------------------------------------------------------------------- 
 	// The reflection and refraction directions are view dependent.
 	//-------------------------------------------------------------------------- 
@@ -72,7 +97,7 @@ void main(void) {
 	interpRefractDir = refract(-view, interpSurfaceNormal, eta);
 	
 	
-	// Translate the y coordinate
+	// Translate the y coordinate with the wave function
 	float K = 0.5f;
 	float u = K * (position.x - velocity * time);
 	float disp = amplitude * sin( u );
