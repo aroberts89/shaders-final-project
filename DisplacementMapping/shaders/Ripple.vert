@@ -72,9 +72,18 @@ void main(void) {
 	interpRefractDir = refract(-view, interpSurfaceNormal, eta);
 	
 	// Translate the y coordinate
-	float r = -sqrt((position.x * position.x) + (position.z * position.z));
+	// Special cases to handle the 0,0 coord
+	float x = (position.x == 0.0f) ? 0.2f : position.x;
+	float z = (position.z == 0.0f) ? 0.2f : position.z;
+
+	float r = -sqrt((x * x) + (z * z));
+	r = min(r, -0.40f);
 	float disp = amplitude * sin(r + time * velocity) / r;
+
+
+	// Add noise
 	disp += noise * rand(vec2(position.x, position.z));
+
 	vec4 dispVector = vec4(normal * disp, 0.0f);
 	vec4 dispPosition = vec4(position, 1.0f) + dispVector;
 
